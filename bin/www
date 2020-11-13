@@ -1,20 +1,7 @@
-const app = require('../app');
 const debug = require('debug')('hn-back-poc:server');
 const http = require('http');
 const displayRoutes = require('express-routemap');
-
-const port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
-
-const server = http.createServer(app);
-
-server.listen(port, () => {
-  console.log(`\x1b[33m starting  the microservice [ hn-back-poc ]. at ${Date().toString()}`);
-  console.log(`\x1b[34m listening on port ${port}`);
-  displayRoutes(app);
-});
-server.on('error', onError);
-server.on('listening', onListening);
+const app = require('../app');
 
 const normalizePort = (val) => {
   const port = parseInt(val, 10);
@@ -28,7 +15,18 @@ const normalizePort = (val) => {
   }
 
   return false;
-}
+};
+
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+const server = http.createServer(app);
+
+server.listen(port, () => {
+  console.log(`\x1b[33m starting  the microservice [ hn-back-poc ]. at ${Date().toString()}`);
+  console.log(`\x1b[34m listening on port ${port}`);
+  displayRoutes(app);
+});
 
 const onError = (error) => {
   if (error.syscall !== 'listen') {
@@ -36,27 +34,30 @@ const onError = (error) => {
   }
 
   const bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+    ? `Pipe ${port}`
+    : `Port ${port}`;
 
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+      console.error(`${bind} requires elevated privileges`);
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+      console.error(`${bind} is already in use`);
       process.exit(1);
       break;
     default:
       throw error;
   }
-}
+};
 
 const onListening = () => {
   const addr = server.address();
   const bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-}
+    ? `pipe ${addr}`
+    : `port ${addr.port}`;
+  debug(`Listening on ${bind}`);
+};
+
+server.on('error', onError);
+server.on('listening', onListening);
